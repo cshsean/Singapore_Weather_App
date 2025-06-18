@@ -31,6 +31,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.weather.R
 import com.example.weather.ui.background.DynamicSkyBackground
@@ -60,20 +63,45 @@ fun SettingsScreen(
     val isRainSoundEnabled = viewModel.isRainSoundEnabled
     val shouldPlayRain = isRaining && isRainSoundEnabled
 
-    DisposableEffect(shouldPlayRain) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(shouldPlayRain, lifecycleOwner) {
         var mediaPlayer: MediaPlayer? = null
+
         if (shouldPlayRain) {
-            mediaPlayer = MediaPlayer.create(context, R.raw.rain_sound)?.apply {
+            mediaPlayer = MediaPlayer.create(context, R.raw.rain_sound).apply {
                 isLooping = true
                 start()
             }
         }
+
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    if (shouldPlayRain) mediaPlayer?.start()
+                }
+                Lifecycle.Event.ON_PAUSE,
+                Lifecycle.Event.ON_STOP -> {
+                    mediaPlayer?.pause()
+                }
+                Lifecycle.Event.ON_DESTROY -> {
+                    mediaPlayer?.stop()
+                    mediaPlayer?.release()
+                    mediaPlayer = null
+                }
+                else -> Unit
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
         onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
             mediaPlayer?.stop()
             mediaPlayer?.release()
+            mediaPlayer = null
         }
     }
-
     val useImperialUnits = viewModel.isImperialUnitEnabled
     val isDarkMode = viewModel.isDarkMode
 
