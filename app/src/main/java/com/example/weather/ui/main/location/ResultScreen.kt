@@ -133,7 +133,7 @@ fun LocationItem(
             try {
                 val forecast = viewModel.networkWeatherInfoRepository.getTwoHourForecast()
                 val nearestArea = forecast.areaMetaData.minByOrNull {
-                    viewModel.haversineDistance(
+                    haversineDistance(
                         location.latitude,
                         location.longitude,
                         it.labelLocation.latitude,
