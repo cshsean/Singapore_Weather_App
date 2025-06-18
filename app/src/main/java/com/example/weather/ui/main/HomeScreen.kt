@@ -1,23 +1,16 @@
 package com.example.weather.ui.main
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,20 +18,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.weather.R
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
@@ -67,13 +52,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -81,6 +63,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.weather.ui.background.DynamicSkyBackground
 import kotlinx.coroutines.delay
 import java.time.LocalTime
@@ -196,7 +181,9 @@ fun HomeScreen(
                     val shouldPlayRain = isRaining && isRainSoundEnabled
 
                     // Only create and manage MediaPlayer when needed
-                    DisposableEffect(shouldPlayRain) {
+                    val lifecycleOwner = LocalLifecycleOwner.current
+
+                    DisposableEffect(shouldPlayRain, lifecycleOwner) {
                         var mediaPlayer: MediaPlayer? = null
 
                         if (shouldPlayRain) {
@@ -206,7 +193,28 @@ fun HomeScreen(
                             }
                         }
 
+                        val observer = LifecycleEventObserver { _, event ->
+                            when (event) {
+                                Lifecycle.Event.ON_RESUME -> {
+                                    if (shouldPlayRain) mediaPlayer?.start()
+                                }
+                                Lifecycle.Event.ON_PAUSE,
+                                Lifecycle.Event.ON_STOP -> {
+                                    mediaPlayer?.pause()
+                                }
+                                Lifecycle.Event.ON_DESTROY -> {
+                                    mediaPlayer?.stop()
+                                    mediaPlayer?.release()
+                                    mediaPlayer = null
+                                }
+                                else -> Unit
+                            }
+                        }
+
+                        lifecycleOwner.lifecycle.addObserver(observer)
+
                         onDispose {
+                            lifecycleOwner.lifecycle.removeObserver(observer)
                             mediaPlayer?.stop()
                             mediaPlayer?.release()
                             mediaPlayer = null
