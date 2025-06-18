@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.example.weather.data.FavoriteEntity
 import com.example.weather.data.LocationEntity
 import com.example.weather.ui.main.getWeatherImageRes
+import com.example.weather.ui.main.utils.haversineDistance
 import com.google.gson.Gson
 
 @Composable
