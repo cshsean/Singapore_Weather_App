@@ -120,7 +120,7 @@ fun FavoriteItem(
         try {
             val forecast = viewModel.networkWeatherInfoRepository.getTwoHourForecast()
             val nearestArea = forecast.areaMetaData.minByOrNull {
-                viewModel.haversineDistance(
+                haversineDistance(
                     lat,
                     lon,
                     it.labelLocation.latitude,
