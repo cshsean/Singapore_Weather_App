@@ -57,8 +57,10 @@ import com.example.weather.data.LocationEntity
 import com.example.weather.ui.background.DynamicSkyBackground
 import com.example.weather.ui.main.WeatherUiState
 import com.example.weather.ui.main.getWeatherImageRes
+import com.example.weather.ui.main.utils.haversineDistance
 import kotlinx.coroutines.delay
 import java.time.LocalTime
+
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
