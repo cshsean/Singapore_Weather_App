@@ -8,6 +8,8 @@ SGWeather is a modern Android weather application designed specifically for Sing
   <img src="https://github.com/user-attachments/assets/f289b4b5-8621-495e-aa2c-bbd155c78ae9" alt="weather_home" width="200"/>
   <img src="https://github.com/user-attachments/assets/e15f7711-9005-40fc-aa9a-28c049acc05f" alt="weather_home_dawn" width="200"/>
   <img src="https://github.com/user-attachments/assets/e2b7db8e-539a-4cdf-b702-8b8e7612c11c" alt="weather_home_night" width="200"/>
+</p>
+<p align="center">
   <img src="https://github.com/user-attachments/assets/b5e9f569-d2de-4a28-b2bc-891746636e35" alt="weather_fav" width="200"/>
   <img src="https://github.com/user-attachments/assets/8f7cc03d-1200-411b-a94f-00c4b0c8b71c" alt="weather_mock" width="200"/>
   <img src="https://github.com/user-attachments/assets/0908e789-9eb0-4a78-bba7-fd33d4646650" alt="weather_settings" width="200"/>
